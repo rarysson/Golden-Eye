@@ -15,10 +15,16 @@
       <h2 class="font-bold text-lg">Transactions</h2>
 
       <div
-        class="border-y border-gray-300 mt-5 max-h-[42.1875rem] overflow-auto"
+        class="border-y border-gray-300 mt-5 max-h-[42.1875rem] overflow-auto relative"
+        @scroll="handleTransactionsScroll"
       >
-        <loading v-if="isFetchingData" />
+        <loading v-if="isFetchingData && !transactions.length" />
         <transactions-table v-else :transactions="transactions" />
+
+        <loading
+          v-show="isFetchingData && transactions.length"
+          class="sticky bottom-0"
+        />
       </div>
     </main>
   </div>
@@ -34,16 +40,52 @@ import Loading from "./components/Loading.vue";
 const transactions = ref<Transaction[]>([]);
 const isFetchingData = ref(false);
 const errorMessage = ref("");
+const idScrollDebounce = ref<number | undefined>(undefined);
+const hasMoreTransactionsToFetch = ref(true);
+const currentTransactionsPage = ref(1);
 
-onBeforeMount(async () => {
+const TRANSACTIONS_PER_PAGE = 50;
+
+function handleTransactionsScroll({ target }: Event) {
+  clearTimeout(idScrollDebounce.value);
+
+  idScrollDebounce.value = setTimeout(() => {
+    if (target) {
+      const { offsetHeight, scrollTop, scrollHeight } =
+        target as HTMLDivElement;
+
+      // Reached the end of the TransactionsTable container
+      if (
+        offsetHeight + scrollTop >= scrollHeight &&
+        hasMoreTransactionsToFetch
+      ) {
+        getTransactionsData();
+      }
+    }
+  }, 250);
+}
+
+async function getTransactionsData() {
   isFetchingData.value = true;
 
   try {
-    transactions.value = await fetchTransactions();
+    const response = await fetchTransactions();
+
+    transactions.value = [...transactions.value, ...response];
+    hasMoreTransactionsToFetch.value =
+      response.length === TRANSACTIONS_PER_PAGE;
+
+    if (hasMoreTransactionsToFetch.value) {
+      currentTransactionsPage.value++;
+    }
   } catch {
     errorMessage.value = "Something went wrong. Reload the page!";
   } finally {
     isFetchingData.value = false;
   }
+}
+
+onBeforeMount(() => {
+  getTransactionsData();
 });
 </script>
