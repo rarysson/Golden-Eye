@@ -10,9 +10,13 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "prisma": {
+    "seed": "ts-node prisma/seed.ts"
+  },
   "dependencies": {
     "@prisma/client": "^4.1.1",
     "apollo-server": "^3.10.0",
+    "fast-csv": "^4.3.6",
     "graphql": "^16.5.0"
   },
   "devDependencies": {
