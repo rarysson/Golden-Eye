@@ -1,6 +1,12 @@
-import { Transaction } from "../interfaces/transaction";
+import { Account } from "../interfaces/account";
+import {
+  Transaction,
+  TransactionsRequestInput
+} from "../interfaces/transaction";
 
-export async function fetchTransactions(): Promise<Transaction[]> {
+export async function fetchTransactions(
+  _transactionInput: TransactionsRequestInput
+): Promise<Transaction[]> {
   await new Promise((r) => setTimeout(r, 1000));
 
   return [...Array(50)].map((_, index) => ({
@@ -15,5 +21,14 @@ export async function fetchTransactions(): Promise<Transaction[]> {
       amount: 99.97 * index,
       currency: "EUR"
     }
+  }));
+}
+
+export async function fetchAccounts(): Promise<Account[]> {
+  await new Promise((r) => setTimeout(r, 1000));
+
+  return [...Array(10)].map((_, index) => ({
+    id: String(index),
+    name: "account"
   }));
 }

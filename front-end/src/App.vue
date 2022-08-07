@@ -14,15 +14,33 @@
     >
       <h2 class="font-bold text-lg">Transactions</h2>
 
+      <div class="mt-5 flex gap-5">
+        <account-select
+          :account-options="accountOptions"
+          :disabled="isFetchingAccounts || isFetchingTransactions"
+          @select="transactionsFilters.account = $event"
+        />
+        <date-input
+          title="Starting month"
+          :disabled="isFetchingAccounts || isFetchingTransactions"
+          @change="transactionsFilters.startingMonth = $event"
+        />
+        <date-input
+          title="Ending month"
+          :disabled="isFetchingAccounts || isFetchingTransactions"
+          @change="transactionsFilters.endingMonth = $event"
+        />
+      </div>
+
       <div
         class="border-y border-gray-300 mt-5 max-h-[42.1875rem] overflow-auto relative"
         @scroll="handleTransactionsScroll"
       >
-        <loading v-if="isFetchingData && !transactions.length" />
+        <loading v-if="isFetchingTransactions && !transactions.length" />
         <transactions-table v-else :transactions="transactions" />
 
         <loading
-          v-show="isFetchingData && transactions.length"
+          v-show="isFetchingTransactions && transactions.length"
           class="sticky bottom-0"
         />
       </div>
@@ -31,18 +49,28 @@
 </template>
 
 <script setup lang="ts">
-import { onBeforeMount, ref } from "vue";
-import { Transaction } from "./interfaces/transaction";
-import { fetchTransactions } from "./services/api";
+import { onBeforeMount, ref, watch } from "vue";
+import { Transaction, TransactionFilters } from "./interfaces/transaction";
+import { fetchAccounts, fetchTransactions } from "./services/api";
 import TransactionsTable from "./components/TransactionsTable.vue";
 import Loading from "./components/Loading.vue";
+import AccountSelect from "./components/AccountSelect.vue";
+import { Account } from "./interfaces/account";
+import DateInput from "./components/DateInput.vue";
 
 const transactions = ref<Transaction[]>([]);
-const isFetchingData = ref(false);
+const isFetchingTransactions = ref(false);
 const errorMessage = ref("");
 const idScrollDebounce = ref<number | undefined>(undefined);
 const hasMoreTransactionsToFetch = ref(true);
 const currentTransactionsPage = ref(1);
+const accountOptions = ref<Account[]>([]);
+const isFetchingAccounts = ref(false);
+const transactionsFilters = ref<TransactionFilters>({
+  account: null,
+  startingMonth: null,
+  endingMonth: null
+});
 
 const TRANSACTIONS_PER_PAGE = 50;
 
@@ -57,7 +85,8 @@ function handleTransactionsScroll({ target }: Event) {
       // Reached the end of the TransactionsTable container
       if (
         offsetHeight + scrollTop >= scrollHeight &&
-        hasMoreTransactionsToFetch
+        hasMoreTransactionsToFetch.value &&
+        !isFetchingTransactions.value
       ) {
         getTransactionsData();
       }
@@ -66,10 +95,16 @@ function handleTransactionsScroll({ target }: Event) {
 }
 
 async function getTransactionsData() {
-  isFetchingData.value = true;
+  isFetchingTransactions.value = true;
 
   try {
-    const response = await fetchTransactions();
+    const response = await fetchTransactions({
+      input: {
+        first: TRANSACTIONS_PER_PAGE,
+        offset: currentTransactionsPage.value,
+        filter: transactionsFilters.value
+      }
+    });
 
     transactions.value = [...transactions.value, ...response];
     hasMoreTransactionsToFetch.value =
@@ -81,11 +116,34 @@ async function getTransactionsData() {
   } catch {
     errorMessage.value = "Something went wrong. Reload the page!";
   } finally {
-    isFetchingData.value = false;
+    isFetchingTransactions.value = false;
   }
 }
 
+async function getAccountsData() {
+  isFetchingAccounts.value = true;
+
+  try {
+    accountOptions.value = await fetchAccounts();
+  } catch {
+    errorMessage.value = "Something went wrong. Reload the page!";
+  } finally {
+    isFetchingAccounts.value = false;
+  }
+}
+
+watch(
+  transactionsFilters,
+  () => {
+    transactions.value = [];
+    currentTransactionsPage.value = 1;
+    getTransactionsData();
+  },
+  { deep: true }
+);
+
 onBeforeMount(() => {
   getTransactionsData();
+  getAccountsData();
 });
 </script>
