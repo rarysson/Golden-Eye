@@ -9,3 +9,28 @@ datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
 }
+
+model Account {
+  id          String        @id @default(uuid())
+  name        String
+  Transaction Transaction[]
+}
+
+model Category {
+  id          String        @id @default(uuid())
+  name        String
+  color       String?
+  Transaction Transaction[]
+}
+
+model Transaction {
+  id         String   @id @default(uuid())
+  accountId  String
+  categoryId String
+  reference  String?
+  amount     Float
+  currency   String
+  date       DateTime
+  account    Account  @relation(fields: [accountId], references: [id])
+  category   Category @relation(fields: [categoryId], references: [id])
+}
