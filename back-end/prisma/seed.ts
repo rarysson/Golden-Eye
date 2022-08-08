@@ -25,6 +25,7 @@ async function main() {
   await prisma.transaction.createMany({
     data: transactionsData.map((transaction) => ({
       ...transaction,
+      categoryId: transaction.categoryId || null,
       amount: parseFloat(String(transaction.amount)),
       reference: transaction.reference || null,
       date: new Date(transaction.date)

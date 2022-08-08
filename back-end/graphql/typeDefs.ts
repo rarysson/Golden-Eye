@@ -23,7 +23,7 @@ export const typeDefs = gql`
     id: String!
     reference: String
     date: Date!
-    category: Category!
+    category: Category
     money: Money!
   }
 

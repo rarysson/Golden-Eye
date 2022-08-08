@@ -1,4 +1,4 @@
-import { Account } from "@prisma/client";
+import { Account } from "../interfaces/account";
 import { ApolloContext } from "../interfaces/apolloContext";
 import {
   TransactionsQueryInput,
@@ -29,6 +29,11 @@ export const resolvers = {
       const transactions = await context.prisma.transaction.findMany({
         take: input.first,
         skip: skipCount,
+        where: {
+          accountId: {
+            equals: input.filters?.accountId
+          }
+        },
         include: { category: true }
       });
 
@@ -36,10 +41,7 @@ export const resolvers = {
         id: transaction.id,
         date: transaction.date,
         reference: transaction.reference,
-        category: {
-          name: transaction.category.name,
-          color: transaction.category.color
-        },
+        category: transaction.category,
         money: {
           amount: transaction.amount,
           currency: transaction.currency

@@ -1,7 +1,9 @@
+import { Category } from "./category";
+
 export interface Transaction {
   id: string;
   accountId: string;
-  categoryId: string;
+  categoryId: string | null;
   reference: string | null;
   amount: number;
   currency: string;
@@ -9,9 +11,9 @@ export interface Transaction {
 }
 
 interface TransactionsFilter {
-  accountId?: string | null;
-  startingMonth?: string | null;
-  endingMonth?: string | null;
+  accountId?: string;
+  startingMonth?: string;
+  endingMonth?: string;
 }
 
 export interface TransactionsQueryInput {
@@ -26,10 +28,7 @@ export interface TransactionsQueryResponse {
   id: string;
   reference: string | null;
   date: Date;
-  category: {
-    name: string;
-    color: string | null;
-  };
+  category: Category | null;
   money: {
     amount: number;
     currency: string;
