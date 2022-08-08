@@ -1,17 +1,17 @@
-const { GraphQLScalarType } = require("graphql");
-
-const dateScalar = new GraphQLScalarType({
-  name: "Date",
-  description: "Date custom scalar type",
-  serialize(value: Date) {
-    return value.toISOString();
-  },
-  parseValue(value: string) {
-    return new Date(value);
-  }
-});
+import { Account } from "@prisma/client";
+import { ApolloContext } from "../interfaces/apolloContext";
+import { EmptyObject } from "../types/internals";
+import { dateScalar } from "./scalarTypes";
 
 export const resolvers = {
   Date: dateScalar,
-  Query: {}
+  Query: {
+    async accounts(
+      _parent: void,
+      _args: EmptyObject,
+      context: ApolloContext
+    ): Promise<Account[]> {
+      return context.prisma.account.findMany();
+    }
+  }
 };
