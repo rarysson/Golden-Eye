@@ -12,8 +12,8 @@ export interface Transaction {
 
 interface TransactionsFilter {
   accountId?: string;
-  startingMonth?: string;
-  endingMonth?: string;
+  startingMonth?: Date;
+  endingMonth?: Date;
 }
 
 export interface TransactionsQueryInput {
