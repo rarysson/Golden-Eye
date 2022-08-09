@@ -2,8 +2,8 @@
   <table class="w-full">
     <thead class="text-left text-gray-400">
       <tr>
-        <th class="font-normal w-6/12 px-2 py-4">Reference</th>
-        <th class="font-normal w-3/12 px-2 py-4">Category</th>
+        <th class="font-normal w-5/12 px-2 py-4">Reference</th>
+        <th class="font-normal w-4/12 px-2 py-4">Category</th>
         <th
           class="font-normal w-1/12 px-2 py-4 cursor-pointer"
           @click="toggleSortType"
@@ -27,16 +27,7 @@
           <span v-else class="text-gray-400">No reference provided</span>
         </td>
         <td class="px-2 py-4">
-          <span
-            v-if="transaction.category"
-            class="text-gray-900 rounded-md py-2 px-4"
-            :style="{
-              'background-color': getCategoryColor(transaction.category.color)
-            }"
-          >
-            {{ transaction.category.name }}
-          </span>
-          <span>-</span>
+          <category-badge :category="transaction.category" />
         </td>
         <td class="px-2 py-4">{{ formatDate(transaction.date) }}</td>
         <td class="text-right px-2 py-4">
@@ -53,6 +44,7 @@ import { compareAsc, compareDesc, format } from "date-fns";
 import { onBeforeMount, PropType, ref, watch } from "vue";
 import { TableSort } from "../interfaces/sort";
 import { Transaction } from "../interfaces/transaction";
+import CategoryBadge from "./CategoryBadge.vue";
 
 const props = defineProps({
   transactions: {
@@ -68,10 +60,6 @@ function toggleSortType() {
   currentSortType.value = currentSortType.value === "desc" ? "asc" : "desc";
 
   sortTransactions();
-}
-
-function getCategoryColor(color: string | null): string {
-  return color ? `#${color}` : "#f2f2f2";
 }
 
 function formatDate(date: Date): string {

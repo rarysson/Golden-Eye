@@ -110,7 +110,7 @@ async function getTransactionsData() {
       input: {
         first: TRANSACTIONS_PER_PAGE,
         offset: currentTransactionsPage.value,
-        filter: transactionsFilters.value
+        filters: transactionsFilters.value
       }
     });
 
@@ -145,6 +145,7 @@ watch(
   () => {
     transactions.value = [];
     currentTransactionsPage.value = 1;
+    console.log(transactionsFilters.value);
     getTransactionsData();
   },
   { deep: true }

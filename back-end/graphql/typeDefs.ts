@@ -41,6 +41,6 @@ export const typeDefs = gql`
 
   type Query {
     accounts: [Account!]!
-    transactions(input: TransactionInput): [Transaction!]!
+    transactions(input: TransactionInput!): [Transaction!]!
   }
 `;

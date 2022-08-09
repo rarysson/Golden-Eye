@@ -1,4 +1,4 @@
-interface Category {
+export interface Category {
   name: string;
   color: string | null;
 }
@@ -26,6 +26,12 @@ export interface TransactionsRequestInput {
   input: {
     first: number;
     offset?: number;
-    filter?: TransactionFilters;
+    filters?: TransactionFilters;
+  };
+}
+
+export interface TransactionsGraphQLResponse {
+  data: {
+    transactions: Transaction[];
   };
 }
