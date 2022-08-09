@@ -24,7 +24,9 @@ defineProps({
     default: false
   }
 });
-const emit = defineEmits(["change"]);
+const emit = defineEmits<{
+  (event: "change", date: string | null): void;
+}>();
 
 const date = ref<string | null>(null);
 

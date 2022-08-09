@@ -33,9 +33,11 @@ defineProps({
     default: false
   }
 });
-const emit = defineEmits(["select"]);
+const emit = defineEmits<{
+  (event: "select", accountId: string | null): void;
+}>();
 
-const currentAccountOption = ref<Account | null>(null);
+const currentAccountOption = ref<string | null>(null);
 
 watch(currentAccountOption, () => {
   emit("select", currentAccountOption.value);

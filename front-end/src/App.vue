@@ -18,17 +18,25 @@
         <account-select
           :account-options="accountOptions"
           :disabled="isFetchingAccounts || isFetchingTransactions"
-          @select="transactionsFilters.account = $event"
+          @select="
+            transactionsFilters.accountId = $event !== null ? $event : undefined
+          "
         />
         <date-input
           title="Starting month"
           :disabled="isFetchingAccounts || isFetchingTransactions"
-          @change="transactionsFilters.startingMonth = $event"
+          @change="
+            transactionsFilters.startingMonth =
+              $event !== null ? $event : undefined
+          "
         />
         <date-input
           title="Ending month"
           :disabled="isFetchingAccounts || isFetchingTransactions"
-          @change="transactionsFilters.endingMonth = $event"
+          @change="
+            transactionsFilters.endingMonth =
+              $event !== null ? $event : undefined
+          "
         />
       </div>
 
@@ -67,9 +75,9 @@ const currentTransactionsPage = ref(1);
 const accountOptions = ref<Account[]>([]);
 const isFetchingAccounts = ref(false);
 const transactionsFilters = ref<TransactionFilters>({
-  account: null,
-  startingMonth: null,
-  endingMonth: null
+  accountId: undefined,
+  startingMonth: undefined,
+  endingMonth: undefined
 });
 
 const TRANSACTIONS_PER_PAGE = 50;

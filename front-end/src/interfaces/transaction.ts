@@ -1,27 +1,31 @@
+interface Category {
+  name: string;
+  color: string | null;
+}
+
+interface Money {
+  amount: number;
+  currency: string;
+}
+
 export interface Transaction {
   id: string;
   reference: string | null;
-  date: string;
-  category: {
-    name: string;
-    color: string | null;
-  };
-  money: {
-    amount: number;
-    currency: string;
-  };
+  date: Date;
+  category: Category | null;
+  money: Money;
 }
 
 export interface TransactionFilters {
-  account?: string | null;
-  startingMonth?: string | null;
-  endingMonth?: string | null;
+  accountId?: string;
+  startingMonth?: string;
+  endingMonth?: string;
 }
 
 export interface TransactionsRequestInput {
   input: {
     first: number;
-    offset: number;
+    offset?: number;
     filter?: TransactionFilters;
   };
 }

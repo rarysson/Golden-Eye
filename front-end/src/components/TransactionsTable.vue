@@ -28,6 +28,7 @@
         </td>
         <td class="px-2 py-4">
           <span
+            v-if="transaction.category"
             class="text-gray-900 rounded-md py-2 px-4"
             :style="{
               'background-color': getCategoryColor(transaction.category.color)
@@ -35,6 +36,7 @@
           >
             {{ transaction.category.name }}
           </span>
+          <span>-</span>
         </td>
         <td class="px-2 py-4">{{ formatDate(transaction.date) }}</td>
         <td class="text-right px-2 py-4">
@@ -72,7 +74,7 @@ function getCategoryColor(color: string | null): string {
   return color ? `#${color}` : "#f2f2f2";
 }
 
-function formatDate(date: string): string {
+function formatDate(date: Date): string {
   return format(new Date(date), "dd/MM/yy");
 }
 
