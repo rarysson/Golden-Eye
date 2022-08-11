@@ -8,7 +8,7 @@
           class="font-normal w-1/12 px-2 py-4 cursor-pointer"
           @click="toggleSortType"
         >
-          Date {{ currentSortType === "desc" ? "&#9660;" : "&#9650;" }}
+          Date {{ currentSortType === "DESC" ? "&#9660;" : "&#9650;" }}
         </th>
         <th class="font-normal text-right px-2 py-4">Amount</th>
       </tr>
@@ -16,7 +16,7 @@
 
     <tbody>
       <tr
-        v-for="transaction in sortedTransactions"
+        v-for="transaction in transactions"
         :key="transaction.id"
         class="border-t border-gray-200"
       >
@@ -40,26 +40,28 @@
 </template>
 
 <script setup lang="ts">
-import { compareAsc, compareDesc, format } from "date-fns";
-import { onBeforeMount, PropType, ref, watch } from "vue";
+import { format } from "date-fns";
+import { PropType, ref } from "vue";
 import { TableSort } from "../interfaces/sort";
 import { Transaction } from "../interfaces/transaction";
 import CategoryBadge from "./CategoryBadge.vue";
 
-const props = defineProps({
+defineProps({
   transactions: {
     type: Array as PropType<Transaction[]>,
     required: true
   }
 });
+const emit = defineEmits<{
+  (event: "sort-change", sortType: TableSort): void;
+}>();
 
-const currentSortType = ref<TableSort>("desc");
-const sortedTransactions = ref<Transaction[]>([]);
+const currentSortType = ref<TableSort>("DESC");
 
 function toggleSortType() {
-  currentSortType.value = currentSortType.value === "desc" ? "asc" : "desc";
+  currentSortType.value = currentSortType.value === "DESC" ? "ASC" : "DESC";
 
-  sortTransactions();
+  emit("sort-change", currentSortType.value);
 }
 
 function formatDate(date: Date): string {
@@ -71,25 +73,4 @@ function formatNumber(number: number): string {
 
   return parseFloat(fixedDecimal).toLocaleString();
 }
-
-function sortTransactions() {
-  sortedTransactions.value = [...props.transactions].sort((a, b) => {
-    if (currentSortType.value === "desc") {
-      return compareDesc(new Date(a.date), new Date(b.date));
-    } else {
-      return compareAsc(new Date(a.date), new Date(b.date));
-    }
-  });
-}
-
-watch(
-  () => props.transactions,
-  () => {
-    sortTransactions();
-  }
-);
-
-onBeforeMount(() => {
-  sortTransactions();
-});
 </script>

@@ -45,7 +45,11 @@
         @scroll="handleTransactionsScroll"
       >
         <loading v-if="isFetchingTransactions && !transactions.length" />
-        <transactions-table v-else :transactions="transactions" />
+        <transactions-table
+          v-else
+          :transactions="transactions"
+          @sort-change="handleSortChange"
+        />
 
         <loading
           v-show="isFetchingTransactions && transactions.length"
@@ -65,6 +69,7 @@ import Loading from "./components/Loading.vue";
 import AccountSelect from "./components/AccountSelect.vue";
 import { Account } from "./interfaces/account";
 import DateInput from "./components/DateInput.vue";
+import { TableSort } from "./interfaces/sort";
 
 const transactions = ref<Transaction[]>([]);
 const isFetchingTransactions = ref(false);
@@ -79,6 +84,7 @@ const transactionsFilters = ref<TransactionFilters>({
   startingMonth: undefined,
   endingMonth: undefined
 });
+const currentSortType = ref<TableSort>("DESC");
 
 const TRANSACTIONS_PER_PAGE = 50;
 
@@ -102,6 +108,14 @@ function handleTransactionsScroll({ target }: Event) {
   }, 250);
 }
 
+function handleSortChange(sortType: TableSort) {
+  currentSortType.value = sortType;
+  transactions.value = [];
+  currentTransactionsPage.value = 1;
+
+  getTransactionsData();
+}
+
 async function getTransactionsData() {
   isFetchingTransactions.value = true;
 
@@ -110,6 +124,7 @@ async function getTransactionsData() {
       input: {
         first: TRANSACTIONS_PER_PAGE,
         offset: currentTransactionsPage.value,
+        sortOrder: currentSortType.value,
         filters: transactionsFilters.value
       }
     });

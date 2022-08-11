@@ -27,6 +27,11 @@ export const typeDefs = gql`
     money: Money!
   }
 
+  enum SortTypes {
+    ASC
+    DESC
+  }
+
   input TransactionFilter {
     accountId: String
     startingMonth: Date
@@ -36,6 +41,7 @@ export const typeDefs = gql`
   input TransactionInput {
     first: Int!
     offset: Int
+    sortOrder: SortTypes = DESC
     filters: TransactionFilter
   }
 

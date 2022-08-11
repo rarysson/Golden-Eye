@@ -1,2 +1,2 @@
 // desc: high -> low | asc: low -> high
-export type TableSort = "desc" | "asc";
+export type TableSort = "DESC" | "ASC";

@@ -62,6 +62,9 @@ export const resolvers = {
             lte: endDate
           }
         },
+        orderBy: {
+          date: input.sortOrder === 'DESC' ? 'desc' : 'asc'
+        },
         include: { category: true }
       });
 

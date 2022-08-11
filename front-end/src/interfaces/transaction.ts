@@ -1,3 +1,5 @@
+import { TableSort } from "./sort";
+
 export interface Category {
   name: string;
   color: string | null;
@@ -26,6 +28,7 @@ export interface TransactionsRequestInput {
   input: {
     first: number;
     offset?: number;
+    sortOrder: TableSort;
     filters?: TransactionFilters;
   };
 }

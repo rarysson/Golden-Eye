@@ -20,6 +20,7 @@ export interface TransactionsQueryInput {
   input: {
     first: number;
     offset?: number;
+    sortOrder: 'DESC' | 'ASC';
     filters?: TransactionsFilter | null;
   };
 }
