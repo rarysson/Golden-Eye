@@ -8,7 +8,7 @@
           class="font-normal w-1/12 px-2 py-4 cursor-pointer"
           @click="toggleSortType"
         >
-          Date {{ currentSortType === "DESC" ? "&#9660;" : "&#9650;" }}
+          Date {{ sortType === "DESC" ? "&#9660;" : "&#9650;" }}
         </th>
         <th class="font-normal text-right px-2 py-4">Amount</th>
       </tr>
@@ -18,7 +18,8 @@
       <tr
         v-for="transaction in transactions"
         :key="transaction.id"
-        class="border-t border-gray-200"
+        class="border-t border-gray-200 cursor-pointer hover:bg-slate-50"
+        @click="emit('transaction-select', transaction)"
       >
         <td class="px-2 py-4">
           <template v-if="transaction.reference">{{
@@ -40,37 +41,28 @@
 </template>
 
 <script setup lang="ts">
-import { format } from "date-fns";
-import { PropType, ref } from "vue";
+import { PropType } from "vue";
 import { TableSort } from "../interfaces/sort";
 import { Transaction } from "../interfaces/transaction";
+import { formatDate, formatNumber } from "../services/formatters";
 import CategoryBadge from "./CategoryBadge.vue";
 
-defineProps({
+const props = defineProps({
   transactions: {
     type: Array as PropType<Transaction[]>,
+    required: true
+  },
+  sortType: {
+    type: String as PropType<TableSort>,
     required: true
   }
 });
 const emit = defineEmits<{
   (event: "sort-change", sortType: TableSort): void;
+  (event: "transaction-select", transaction: Transaction): void;
 }>();
 
-const currentSortType = ref<TableSort>("DESC");
-
 function toggleSortType() {
-  currentSortType.value = currentSortType.value === "DESC" ? "ASC" : "DESC";
-
-  emit("sort-change", currentSortType.value);
-}
-
-function formatDate(date: Date): string {
-  return format(new Date(date), "dd/MM/yy");
-}
-
-function formatNumber(number: number): string {
-  const fixedDecimal = number.toFixed(2);
-
-  return parseFloat(fixedDecimal).toLocaleString();
+  emit("sort-change", props.sortType === "DESC" ? "ASC" : "DESC");
 }
 </script>

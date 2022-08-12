@@ -1,12 +1,7 @@
 <template>
-  <div
-    v-if="errorMessage"
-    class="fixed top-0 left-0 text-center w-full py-3 bg-red-500 font-bold"
-  >
-    {{ errorMessage }}
-  </div>
+  <alert :error-message="errorMessage" />
 
-  <div class="flex flex-col h-full">
+  <div class="flex flex-col h-full p-8 pb-16">
     <h1 class="text-center font-bold text-3xl">Golden Eye</h1>
 
     <main
@@ -48,7 +43,9 @@
         <transactions-table
           v-else
           :transactions="transactions"
+          :sort-type="currentSortType"
           @sort-change="handleSortChange"
+          @transaction-select="handleTransactionSelect"
         />
 
         <loading
@@ -58,6 +55,11 @@
       </div>
     </main>
   </div>
+
+  <transaction-details-modal
+    :transaction="currentTransaction"
+    @close="currentTransaction = null"
+  />
 </template>
 
 <script setup lang="ts">
@@ -70,6 +72,8 @@ import AccountSelect from "./components/AccountSelect.vue";
 import { Account } from "./interfaces/account";
 import DateInput from "./components/DateInput.vue";
 import { TableSort } from "./interfaces/sort";
+import Alert from "./components/Alert.vue";
+import TransactionDetailsModal from "./components/TransactionDetailsModal.vue";
 
 const transactions = ref<Transaction[]>([]);
 const isFetchingTransactions = ref(false);
@@ -85,6 +89,7 @@ const transactionsFilters = ref<TransactionFilters>({
   endingMonth: undefined
 });
 const currentSortType = ref<TableSort>("DESC");
+const currentTransaction = ref<Transaction | null>(null);
 
 const TRANSACTIONS_PER_PAGE = 50;
 
@@ -114,6 +119,10 @@ function handleSortChange(sortType: TableSort) {
   currentTransactionsPage.value = 1;
 
   getTransactionsData();
+}
+
+function handleTransactionSelect(transaction: Transaction) {
+  currentTransaction.value = transaction;
 }
 
 async function getTransactionsData() {
